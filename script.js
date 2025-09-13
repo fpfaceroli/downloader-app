@@ -10,7 +10,10 @@ document.addEventListener('DOMContentLoaded', () => {
         resultsContainer.innerHTML = '<p class="loading-message">Buscando informações do vídeo, aguarde...</p>';
 
         try {
-            const response = await fetch('http://127.0.0.1:5000/download', {
+            // ---- A MUDANÇA ESTÁ AQUI ----
+            // Removemos o "http://127.0.0.1:5000" para que o navegador
+            // procure o endpoint /download no próprio domínio do site.
+            const response = await fetch('/download', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ url: videoUrl }),
@@ -18,10 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const data = await response.json();
 
-            // ---- LÓGICA PARA EXIBIR OS RESULTADOS ----
-
             if (data.success) {
-                // Se o backend retornou sucesso, construímos o HTML dos resultados
                 let html = `
                     <div class="video-info">
                         <img src="${data.thumbnail}" alt="Miniatura do vídeo" class="thumbnail">
@@ -31,7 +31,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         <h4>Selecione um formato para baixar:</h4>
                 `;
 
-                // Criamos um botão de download para cada formato encontrado
                 data.formats.forEach(format => {
                     html += `<a href="${format.url}" class="download-button" target="_blank" download>
                                 Baixar (${format.quality} - ${format.ext})
@@ -42,7 +41,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 resultsContainer.innerHTML = html;
 
             } else {
-                // Se deu erro, mostramos a mensagem de erro do backend
                 resultsContainer.innerHTML = `<p class="error-message">${data.message}</p>`;
             }
 
